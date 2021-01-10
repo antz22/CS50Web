@@ -1,0 +1,14 @@
+first, create django project
+
+then create startapp <name of app>
+go to settings to change urls
+go to urls.py to add path / urlpatterns
+go to directory of the app and add urls.py with that specific apps urlpatterns with views.index
+go to views.py and create a function called index
+    return render whatever
+for html templates, go to your app directory, create a folder called templates, create within it a folder named whatever your app is named
+
+
+
+remember to save!
+Remember to avoid typos!
