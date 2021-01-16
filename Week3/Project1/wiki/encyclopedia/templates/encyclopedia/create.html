@@ -7,6 +7,17 @@
 
 {% block body %}
 
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li>
+                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+                    {{ message }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
     <h1>Create Entry</h1>
 
     <h2>Title</h2>
@@ -17,7 +28,7 @@
 
     <h2>Content</h2>
 
-    <textarea rows="10" id="create" name="content" placeholder="Content in markdown" form="create"></textarea>
+    <textarea rows="10" id="create" name="content" placeholder="Content in markdown" form="create" style="height: 60vh;"></textarea>
 
     <br>
     <input action="{% url 'create' %}" type="submit" form="create" formaction="{% url 'create' %}">

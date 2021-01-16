@@ -2,7 +2,7 @@ from django import forms
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
-import bleach
+from django.contrib import messages
 
 import random
 from markdown2 import Markdown
@@ -47,12 +47,19 @@ def create(request):
         form = request.POST
         title = form['title']
         content = form['content']
-        util.save_entry(title, content)
-        return render(request, "encyclopedia/index.html", {
-            "entries": util.list_entries()
-        })
+
+        entries = util.list_entries()
+        for entry in entries:
+            if title == entry:
+                messages.error(request, 'This entry already exists.')
+                return render(request, "encyclopedia/create.html")
+        else:
+            util.save_entry(title, content)
+            return render(request, "encyclopedia/index.html", {
+                "entries": util.list_entries()
+            })
 # also fix thing with making sure it doesn't hvae existing entry/title
-# probably have to look over this again. the notpython entry markdown is all screwed up.
+
 
     return render(request, "encyclopedia/create.html")
 
@@ -65,7 +72,6 @@ def edit(request, name):
         title = name
         content = form['content']
         util.save_entry(title, content)
-        entry = util.get_entry(title)
         
         return HttpResponseRedirect('/wiki/%s/' % name)
     
