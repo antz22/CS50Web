@@ -12,3 +12,19 @@ for html templates, go to your app directory, create a folder called templates, 
 
 remember to save!
 Remember to avoid typos!
+
+
+
+
+
+Project 1:
+
+
+# screwed something up with naming stuff wiki. 
+# prolly have to rewatch some of hte lecture
+# do 127.0.0.1:8000 to visit the index page, do /wiki/TITLE to get to the other page. Is it an app?
+# why is the encyclopedia app index page viewable without any /encyclopedia? it was like that for other apps
+
+
+# # NotPython NotPython is not a programming language that can be used both for 
+# writing **command-line scripts** or building **web applications**.
