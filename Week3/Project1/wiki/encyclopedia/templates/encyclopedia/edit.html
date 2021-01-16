@@ -1,0 +1,19 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Edit Entry
+{% endblock %}
+
+
+{% block body %}
+
+    <h1>Edit Entry</h1>
+
+    <h2>{{ title }}</h2>
+
+    <textarea id="create" name="content" placeholder="Content in markdown" form="create">{{ entry }}</textarea>
+
+    <br>
+    <input action="{% url 'create' %}" type="submit" form="create" formaction="{% url 'create' %}">
+
+{% endblock %}
