@@ -7,13 +7,10 @@
 
 {% block body %}
 
-    <h1>Edit Entry</h1>
+    <h1>Edit {{ title }}</h1>
 
-    <h2>{{ title }}</h2>
-
-    <textarea id="create" name="content" placeholder="Content in markdown" form="create">{{ entry }}</textarea>
-
-    <br>
-    <input action="{% url 'create' %}" type="submit" form="create" formaction="{% url 'create' %}">
-
+    <form action="/edit/{{ title }}/" method="post" id="edit"> {% csrf_token %}
+        <textarea id="text" name="content" placeholder="Content in Markdown" form="edit" style="white-space: normal;">{{ entry }}</textarea>
+    </form>
+    <input action="/edit/{{ title }}/" type="submit" form="edit" formaction="/edit/{{ title }}/" value="Save">
 {% endblock %}
