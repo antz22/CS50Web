@@ -32,7 +32,6 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'encyclopedia',
-    'django_bleach',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

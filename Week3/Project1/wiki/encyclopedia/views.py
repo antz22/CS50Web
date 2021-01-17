@@ -55,9 +55,7 @@ def create(request):
                 return render(request, "encyclopedia/create.html")
         else:
             util.save_entry(title, content)
-            return render(request, "encyclopedia/index.html", {
-                "entries": util.list_entries()
-            })
+            return HttpResponseRedirect('/wiki/%s/' % title)
 # also fix thing with making sure it doesn't hvae existing entry/title
 
 
