@@ -1,2 +1,0 @@
-# Yikes
-Hello there **friends**!

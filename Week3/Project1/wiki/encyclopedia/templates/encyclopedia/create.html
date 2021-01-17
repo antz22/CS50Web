@@ -8,25 +8,23 @@
 {% block body %}
 
     {% if messages %}
-    <ul>
+    <ul class="alert alert-danger" role="alert" style="width: 800px;">
         {% for message in messages %}
-            <li>
-                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
-                    {{ message }}
-        </li>
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Error: {% endif %}
+                {{ message }}
         {% endfor %}
     </ul>
     {% endif %}
 
     <h1>Create Entry</h1>
 
-    <h2>Title</h2>
+    <h4>Title</h4>
     <form id="create" action="{% url 'create' %}" method="post">
         {% csrf_token %}
         <input type="text" name="title" placeholder="Title">
     </form>
 
-    <h2>Content</h2>
+    <h4>Content</h4>
 
     <textarea rows="10" id="create" name="content" placeholder="Content in markdown" form="create" style="height: 60vh;"></textarea>
 
