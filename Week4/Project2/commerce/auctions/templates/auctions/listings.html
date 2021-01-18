@@ -1,0 +1,60 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    {% if message %}
+        <ul class="alert alert-danger" role="alert" style="width: 800px;">
+            {{ message }}
+        </ul>
+    {% endif %}
+
+    {% if user == listing.bidder and user != listing.user %}
+        <ul class="alert alert-success" role="alert" style="width: 800 px;">
+            You won this auction!
+        </ul>
+    {% endif %}
+
+    <h2>Listing: {{ listing.title }}</h2>
+
+    <img src="{{ listing.photo }}" alt="{{ listing.title }}">
+
+    <p>Description: {{ listing.description }}</p>
+
+    <h3>Price: {{ listing.price }}</h2>
+
+    <p>Category: {{ listing.category }}</p>
+
+    <p>x bid(s) so far. Your bid is the x bid. </p>
+
+    <form action="/listings/{{ listing.id }}" method="post">
+        <input type="text" placeholder="Bid">
+        <input type="submit" value="Place Bid">
+    </form>
+
+    {% if user == listing.user %}
+        <form action="/listings/{{ listing.id }}" method="post">
+            <input type="submit" value="Close Auction">
+        </form>
+    {% endif %}
+
+
+    <p>Comments</p>
+
+    <ul>
+        {% for comment in comments %}
+            <li>{{ comment }}</li>
+        {% empty %}
+            <li>No comments.</li>
+        {% endfor %}        
+    </ul>
+
+    <h4>Add a comment</h4>
+    <form action="/listings/{{ listing.id }}" method="post">
+        <input type="text" placeholder="Comment">
+        <input type="submit" value="OK">
+    </form>
+
+
+
+    TODO
+{% endblock %}
