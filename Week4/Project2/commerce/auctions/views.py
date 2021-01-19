@@ -7,14 +7,17 @@ from django.shortcuts import render
 from django.urls import reverse
 from django import forms
 
-from .models import User, Listing, Bid, Comment
+from .models import User, Listing, Bid, Comment, Category, Watchlist
 
 class NewListing(forms.Form):
     title = forms.CharField(label="Listing Title")
-    description = forms.TextField(label="Description")
+    description = forms.CharField(label="Description", widget=forms.Textarea)
     price = forms.IntegerField(label="Price")
-    photo = models.TextField(label="Photo URL", blank=True, null=True)
-    category = form.CharField(label="Category", blank=True, null=True)
+    photo = forms.CharField(label="Photo URL", blank=True, null=True)
+    category = forms.CharField(label="Category", blank=True, null=True)
+
+    # ISSUE - django.forms doesn't have TEXTFIELD! what to do then? how long are descriptions?
+    # how to resolve it with other models.py?
 
 
 
@@ -31,7 +34,7 @@ def listings(request, listing_id):
 
     if request.method == "POST":
         if request.user.is_authenticated:
-            user = request.user.get_username()
+            user = request.user.id
 
             context = {
                 "listing": listing,
@@ -92,35 +95,65 @@ def listings(request, listing_id):
     return render(request, "auctions/listings.html", context)
 
 @login_required
-def watchlist(request, user):
-    # TODO
+def watchlist(request):
+    user = request.user.get_username()
+
+    watchlist = User.watchlist.all()
+
+    # problems here
+
 
 def categories(request):
-    # TODO
+    categories = Category.objects.all()
+
+    # problems here - cateogry.objects.all()?
+
+    return render(request, "auctions/categories.html", {
+        "categories": categories
+    })
+
+def categoriesv(request, category_id):
+    category = Category.objects.get(pk=category_id)
+
+    listings = category.listings.all()
+
+    return render(request, "auctions/categoriesv.html", {
+        "category": category,
+        "listings": listings
+    })
+
+    # problems here - category.listings.all()? 
+
 
 def create(request):
     if request.method == "POST":
         form = NewListing(request.POST)
         if form.is_valid():
-            user = request.user.get_username()
+            user = request.user.id
             title = form.cleaned_data["title"]
             description = form.cleaned_data["description"]
             price = form.cleaned_data["price"]
             photo = form.cleaned_data["photo"]
             category = form.cleaned_data["category"]
 
-            listing = Listing.objects.create(user=user, bidder=user, title=title, description=description, price=price, photo=photo, cateogry=category)
+            cat = Category.objects.create(category=cat) # create new instance of category separate from listing           
+            listing = Listing.objects.create(user=user, bidder=user, title=title, description=description, price=price, photo=photo, category=cat)
+            # wait but how to define category in the listing object?
+            cat.listings.add(listing) # add the listing to the manytomany field of the category
+
+            # create new instance of category?
+            # cat = Category.objects.create(category=category)
 
             return render(request, "auctions/index.html", {
                 "listings": Listing.objects.all()
             })
 
         else:
-            return render(request, "auctions/create.html" {
+            return render(request, "auctions/create.html", {
                 "form": form
             })
     
-    return render(request, "auctions/create.html" {
+    return render(request, "auctions/create.html", {
         "form": NewListing()
     })
 
@@ -178,3 +211,5 @@ def register(request):
 
 
 # start using reverse correctly
+# read through all this, make it neat, and make comments.
+# set up admin.py, get watchlist, write the css.
