@@ -16,26 +16,28 @@
 
     <h2>Listing: {{ listing.title }}</h2>
 
+    {% for wlisting in watchlist %}
+        {% if wlisting.id == listing.id %}
+            <p>This item is on your watchlist.</p>
+        {% endif %}
+    {% endfor %}
+
     <img src="{{ listing.photo }}" alt="{{ listing.title }}">
 
-    <p>Description: {{ listing.description }}</p>
+    <p>{{ listing.description }}</p>
+    <br>
+    <h4>${{ listing.price }}</h4>
 
-    <h3>Price: {{ listing.price }}</h2>
-
-    <p>Category: {{ listing.category }}</p>
+    <p>Category: {{ listing.category.category }}</p>
 
     <p>x bid(s) so far. Your bid is the x bid. </p>
 
-    <form action="/listings/{{ listing.id }}" method="post">
-        <input type="text" placeholder="Bid">
-        <input type="submit" value="Place Bid">
-    </form>
-
-    {% if user == listing.user %}
+    <div class="form-group">
         <form action="/listings/{{ listing.id }}" method="post">
-            <input type="submit" value="Close Auction">
-        </form>
-    {% endif %}
+            <input type="text" placeholder="Bid" name="bid" class="form-control"> <br>
+            <input type="submit" value="Place Bid" class="btn btn-primary">
+        </form>        
+    </div>
 
 
     <p>Comments</p>
@@ -45,16 +47,40 @@
             <li>{{ comment }}</li>
         {% empty %}
             <li>No comments.</li>
-        {% endfor %}        
+        {% endfor %}       
+        <br>
+        <p>Add a comment<p>
+        <div class="form-group">
+            <form action="/listings/{{ listing.id }}" method="post">
+                {% csrf_token %}
+                <input type="text" placeholder="Comment" name="comment" class="form-control"> 
+                <br>
+                <input type="submit" value="OK" class="btn btn-primary">
+            </form>
+        </div>             
     </ul>
 
-    <h4>Add a comment</h4>
-    <form action="/listings/{{ listing.id }}" method="post">
-        <input type="text" placeholder="Comment">
-        <input type="submit" value="OK">
-    </form>
+
+
+    <p> Add to watchlist? </p>
+    <div class="form-group">
+        <form action="/listings/{{ listing.id }}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Add" name="watch" class="btn btn-primary">
+        </form>
+    </div>    
+
+    {% if user == listing.user %}
+        <div class="form-group">
+            <form action="/listings/{{ listing.id }}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Close Auction" class="btn btn-primary">
+            </form>
+        </div>    
+    {% endif %}
 
 
 
-    TODO
+
+
 {% endblock %}

@@ -4,16 +4,25 @@ from django.db import models
 
 class User(AbstractUser):
     pass
+    # listings = models.ManyToManyField(Listing, blank=True, related_name="watchlist")
+
+
+class Category(models.Model):
+    category = models.CharField(max_length=64, blank=True, null=True)
+    # category = models.ForeignKey(Category, related_name="listings?") 
+    # listings = models.ManyToManyField(Listing, related_name="listings") # cuz it has multiple?
+    # listings = models.ForeignKey(Listing, related_name="listings")
+    # this is not right...
 
 
 class Listing(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    bidder = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
+    bidder = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bidder")
     title = models.CharField(max_length=64)
     description = models.TextField()
     price = models.FloatField()
     photo = models.TextField(blank=True, null=True) # optional field
-    category = models.ForeignKey(Category, related_name="listings?") 
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="listingsss", blank=True, null=True) 
     # category = models.CharField(max_length=64, blank=True, null=True) 
 
 
@@ -27,11 +36,6 @@ class Comment(models.Model):
     comment = models.TextField()
 
 
-class Category(models.Model):
-    category = models.CharField(max_length=64, blank=True, null=True)
-    listings = models.ManyToManyField(Listing, related_name="listings") # cuz it has multiple?
-    # listings = models.ForeignKey(Listing, related_name="listings")
-    # this is not right...
 
 class Watchlist(models.Model):
     # how to relate it to user? is many to many field correct? is it only on watchlist for just that user?

@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
@@ -10,11 +11,11 @@ from django import forms
 from .models import User, Listing, Bid, Comment, Category, Watchlist
 
 class NewListing(forms.Form):
-    title = forms.CharField(label="Listing Title")
-    description = forms.CharField(label="Description", widget=forms.Textarea)
-    price = forms.IntegerField(label="Price")
-    photo = forms.CharField(label="Photo URL", blank=True, null=True)
-    category = forms.CharField(label="Category", blank=True, null=True)
+    title = forms.CharField(label="Listing Title", widget=forms.TextInput(attrs={'class': "form-control"}))
+    description = forms.CharField(label="Description", widget=forms.Textarea(attrs={'class': "form-control"}))
+    price = forms.FloatField(label="Price", widget=forms.NumberInput(attrs={'class': "form-control"}))
+    photo = forms.CharField(label="Photo URL", required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+    category = forms.CharField(label="Category", required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 
     # ISSUE - django.forms doesn't have TEXTFIELD! what to do then? how long are descriptions?
     # how to resolve it with other models.py?
@@ -30,20 +31,25 @@ def listings(request, listing_id):
 
     listing = Listing.objects.get(pk=listing_id)    
     comments = listing.comments.all()
+    # watchlist = User.watchlist.all()
 
 
     if request.method == "POST":
         if request.user.is_authenticated:
-            user = request.user.id
+            user = request.user
+            wl = Watchlist.objects.get(user=user)
+            watchlist = wl.listings.all()
 
             context = {
                 "listing": listing,
                 "comments": comments,
-                "user": user
+                "user": user,
+                "watchlist": watchlist
             }
 
             bid = round(float(request.POST["bid"]), 2)
             comment0 = request.POST["comment"]
+            watch = request.POST["watch"]
 
             if bid:
                 if bid > listing.price:
@@ -57,7 +63,8 @@ def listings(request, listing_id):
                             return render(request, "auctions/listings.html", {
                                 "listing": listing,
                                 "comments": comments,
-                                "user": user
+                                "user": user,
+                                "watchlist": watchlist
                             })
 
                     messages.error(request, 'Bid must be greater than existing bids.')
@@ -76,11 +83,17 @@ def listings(request, listing_id):
                 return render(request, "auctions/listings.html", {
                     "listing": listing,
                     "comments": comments,
-                    "user": user
+                    "user": user,
+                    "watchlist": watchlist
                 })
 
                 # fi the request is because they submitted a comment
             
+            elif watch:
+                user = request.user
+                watchlist.listing.add(listing)
+
+
             else:
                 return render(request, "auctions/listings.html", context)
 
@@ -89,16 +102,41 @@ def listings(request, listing_id):
             return render(request, "auctions/listings.html", {
                 "listing": listing,
                 "comments": comments,
-                "user": user           
+                "user": None,
+                "watchlist": None        
             })
-   
-    return render(request, "auctions/listings.html", context)
+
+    if request.user.is_authenticated:
+        user = request.user
+        wl = Watchlist.objects.get(user=user)
+        watchlist = wl.listings.all()
+
+        context = {
+            "listing": listing,
+            "comments": comments,
+            "user": user,
+            "watchlist": watchlist
+        }
+        return render(request, "auctions/listings.html", context)
+    else:
+
+        context = {
+            "listing": listing,
+            "comments": comments,
+            "user": None,
+            "watchlist": None
+        }
 
 @login_required
 def watchlist(request):
-    user = request.user.get_username()
+    user = request.user
+    watchlist = Watchlist.objects.get(user=user)
+    listings = watchlist.listings.all()
 
-    watchlist = User.watchlist.all()
+    return render(request, "auctions/watchlist.html", {
+        "listings": listings
+    })
+
 
     # problems here
 
@@ -115,7 +153,7 @@ def categories(request):
 def categoriesv(request, category_id):
     category = Category.objects.get(pk=category_id)
 
-    listings = category.listings.all()
+    listings = category.listingsss.all()
 
     return render(request, "auctions/categoriesv.html", {
         "category": category,
@@ -129,25 +167,22 @@ def create(request):
     if request.method == "POST":
         form = NewListing(request.POST)
         if form.is_valid():
-            user = request.user.id
+            user = request.user
             title = form.cleaned_data["title"]
             description = form.cleaned_data["description"]
             price = form.cleaned_data["price"]
             photo = form.cleaned_data["photo"]
             category = form.cleaned_data["category"]
 
-            cat = Category.objects.create(category=cat) # create new instance of category separate from listing           
+            cat = Category.objects.create(category=category) # create new instance of category separate from listing           
             listing = Listing.objects.create(user=user, bidder=user, title=title, description=description, price=price, photo=photo, category=cat)
             # wait but how to define category in the listing object?
-            cat.listings.add(listing) # add the listing to the manytomany field of the category
+
 
             # create new instance of category?
             # cat = Category.objects.create(category=category)
 
-            return render(request, "auctions/index.html", {
-                "listings": Listing.objects.all()
-            })
-
+            return HttpResponseRedirect(reverse("index"))
         else:
             return render(request, "auctions/create.html", {
                 "form": form
@@ -198,6 +233,10 @@ def register(request):
         # Attempt to create new user
         try:
             user = User.objects.create_user(username, email, password)
+
+            # addition here to create watchlist with every user
+            watch = Watchlist.objects.create(user=user)
+
             user.save()
         except IntegrityError:
             return render(request, "auctions/register.html", {

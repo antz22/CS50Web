@@ -1,0 +1,13 @@
+PSET
+Read through all the code and make comments
+
+
+FOR THE FUTURE
+Figure out foreign key and many to many fields!!!
+Figure out related_name
+
+
+
+close auction
+CSS and HTML...
+Add to watchlist, only if it isn't already on the watchlist
