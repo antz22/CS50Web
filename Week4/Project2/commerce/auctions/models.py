@@ -20,7 +20,7 @@ class Listing(models.Model):
     bidder = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bidder")
     title = models.CharField(max_length=64)
     description = models.TextField()
-    price = models.FloatField()
+    price = models.DecimalField(decimal_places=2, max_digits=9)
     photo = models.TextField(blank=True, null=True) # optional field
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="listingsss", blank=True, null=True) 
     # category = models.CharField(max_length=64, blank=True, null=True) 

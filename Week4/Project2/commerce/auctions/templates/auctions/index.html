@@ -2,14 +2,24 @@
 
 {% block body %}
     <h2>Active Listings</h2>
+    
+    <table class="table" style="border-collapse: collapse; border: 1px light gray">
+        {% for listing in listings %}    
+            <tr>
+                <td style="font-weight: bold;"><a href="{% url 'listings' listing.id %}">{{ listing.title }}</a></td>
+                <td> Price: ${{ listing.price }}</td>
+                <td> {{ listing.description }} </td>
+                <td><img class="img-responsive" src="{{ listing.photo }}" alt="{{ listing.title }}" width="400" height="400"></td>
+            </tr>
+        {% empty %}
+            <p>No active listings.</p>
+        {% endfor %}        
+    </table>
 
-    {% for listing in listings %}    
-        <ul>
-            <li><a href="{% url 'listings' listing.id %}">Listing {{ listing.id }}</a></li>
-            <li> title: {{ listing.title }}</li>
-            <li> price: {{ listing.price }}</li>
-            <li> description: {{ listing.description }} </li>
-            <li> picture: <img src="{{ listing.photo }}" alt="{{ listing.title }}"> </li>
-        </ul>
-    {% endfor %}
 {% endblock %}
+
+
+
+
+
+

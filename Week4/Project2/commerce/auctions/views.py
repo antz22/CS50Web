@@ -13,7 +13,7 @@ from .models import User, Listing, Bid, Comment, Category, Watchlist
 class NewListing(forms.Form):
     title = forms.CharField(label="Listing Title", widget=forms.TextInput(attrs={'class': "form-control"}))
     description = forms.CharField(label="Description", widget=forms.Textarea(attrs={'class': "form-control"}))
-    price = forms.FloatField(label="Price", widget=forms.NumberInput(attrs={'class': "form-control"}))
+    price = forms.DecimalField(label="Price", decimal_places=2, widget=forms.NumberInput(attrs={'class': "form-control"}))
     photo = forms.CharField(label="Photo URL", required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
     category = forms.CharField(label="Category", required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 
@@ -38,7 +38,12 @@ def listings(request, listing_id):
         if request.user.is_authenticated:
             user = request.user
             wl = Watchlist.objects.get(user=user)
-            watchlist = wl.listings.all()
+            watchl = wl.listings.all()
+
+            if listing in watchl:
+                watchlist = True
+            else:
+                watchlist = False
 
             context = {
                 "listing": listing,
@@ -47,28 +52,25 @@ def listings(request, listing_id):
                 "watchlist": watchlist
             }
 
-            bid = round(float(request.POST["bid"]), 2)
-            comment0 = request.POST["comment"]
-            watch = request.POST["watch"]
-
-            if bid:
+            if 'bid' in request.POST:
+                bid = float(format(float(request.POST["bid"]), '.2f'))
                 if bid > listing.price:
-                    bids = listing.bids.all()
-                    for b in bids:
-                        if bid > b:
-                            listing.price = bid
-                            listing.bidder = user
-                            listing.save()
-                            listing = Listing.objects.get(pk=listing_id)
-                            return render(request, "auctions/listings.html", {
-                                "listing": listing,
-                                "comments": comments,
-                                "user": user,
-                                "watchlist": watchlist
-                            })
+                    # bids = listing.bids.all()
+                    # for b in bids:
+                        # if bid > b:
+                    listing.price = bid
+                    listing.bidder = user
+                    listing.save()
+                    listing = Listing.objects.get(pk=listing_id)
+                    return render(request, "auctions/listings.html", {
+                        "listing": listing,
+                        "comments": comments,
+                        "user": user,
+                        "watchlist": watchlist
+                    })
 
-                    messages.error(request, 'Bid must be greater than existing bids.')
-                    return render(request, "auctions/listings.html", context)
+                    # messages.error(request, 'Bid must be greater than existing bids.')
+                    # return render(request, "auctions/listings.html", context)
 
                 else:
                     messages.error(request, 'Bid must be greater than existing bids.')
@@ -76,7 +78,8 @@ def listings(request, listing_id):
 
                 # if the request is because they submitted a bid. but how do you tell? is there an error otherwise?
             
-            elif comment0:
+            elif 'comment' in request.POST:
+                comment0 = request.POST["comment"]
                 comment = Comment.objects.create(comment=comment0)
                 comments = listing.comments.all()
 
@@ -89,10 +92,24 @@ def listings(request, listing_id):
 
                 # fi the request is because they submitted a comment
             
-            elif watch:
+            elif 'watch' in request.POST:
+                watch = request.POST["watch"]
                 user = request.user
-                watchlist.listing.add(listing)
+                watching = Watchlist.objects.get(user=user)
 
+                if listing in watching.listings.all():
+                    watching.listings.remove(listing)
+                    watchlist = False
+                else:
+                    watching.listings.add(listing)
+                    watchlist = True
+
+                return render(request, "auctions/listings.html", {
+                    "listing": listing,
+                    "comments": comments,
+                    "user": user,
+                    "watchlist": watchlist
+                })
 
             else:
                 return render(request, "auctions/listings.html", context)
@@ -126,6 +143,7 @@ def listings(request, listing_id):
             "user": None,
             "watchlist": None
         }
+        return render(request, "auctions/listings.html", context)
 
 @login_required
 def watchlist(request):
@@ -170,13 +188,20 @@ def create(request):
             user = request.user
             title = form.cleaned_data["title"]
             description = form.cleaned_data["description"]
-            price = form.cleaned_data["price"]
+            price = float(format(form.cleaned_data["price"], '.2f'))
             photo = form.cleaned_data["photo"]
             category = form.cleaned_data["category"]
 
+            categories = Category.objects.all()
+            for cate in categories:
+                if category == cate.category:
+                    listing = Listing.objects.create(user=user, bidder=user, title=title, description=description, price=price, photo=photo, category=cate)
+                    return HttpResponseRedirect(reverse("index"))
+           
             cat = Category.objects.create(category=category) # create new instance of category separate from listing           
             listing = Listing.objects.create(user=user, bidder=user, title=title, description=description, price=price, photo=photo, category=cat)
-            # wait but how to define category in the listing object?
+            
+             # wait but how to define category in the listing object?
 
 
             # create new instance of category?

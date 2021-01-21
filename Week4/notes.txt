@@ -10,4 +10,14 @@ Figure out related_name
 
 close auction
 CSS and HTML...
-Add to watchlist, only if it isn't already on the watchlist
+
+x bids so far, your bid is the __ bid
+----
+for this, you could have some sort of loop looping through all the bid objects to see how many are associated with that listing?
+But that's terrible coding. idk.
+length of listing.bids.all()?
+bids are never used...
+-----
+why are there two watchlist objects? and no bids.
+
+
