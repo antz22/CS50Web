@@ -23,7 +23,7 @@ bids are never used...
 why are there two watchlist objects? and no bids.
 
 
-Why doesn't the css load?
+Why doesn't the css load? how to style it not in the html
 Increase the margins
 
 Comments, watchlist, close auction, bids.

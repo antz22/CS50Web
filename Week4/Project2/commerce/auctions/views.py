@@ -50,7 +50,7 @@ def listings(request, listing_id):
                 "comments": comments,
                 "user": user,
                 "watchlist": watchlist
-            }
+            } #how to update context in django without rewriting?
 
             if 'bid' in request.POST:
                 bid = float(format(float(request.POST["bid"]), '.2f'))
@@ -69,15 +69,10 @@ def listings(request, listing_id):
                         "watchlist": watchlist
                     })
 
-                    # messages.error(request, 'Bid must be greater than existing bids.')
-                    # return render(request, "auctions/listings.html", context)
-
                 else:
                     messages.error(request, 'Bid must be greater than existing bids.')
                     return render(request, "auctions/listings.html", context)
 
-                # if the request is because they submitted a bid. but how do you tell? is there an error otherwise?
-            
             elif 'comment' in request.POST:
                 comment0 = request.POST["comment"]
                 comment = Comment.objects.create(comment=comment0)
@@ -90,8 +85,6 @@ def listings(request, listing_id):
                     "watchlist": watchlist
                 })
 
-                # fi the request is because they submitted a comment
-            
             elif 'watch' in request.POST:
                 watch = request.POST["watch"]
                 user = request.user
