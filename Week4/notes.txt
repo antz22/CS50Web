@@ -9,6 +9,7 @@ Figure out related_name
 
 
 close auction
+
 CSS and HTML...
 
 x bids so far, your bid is the __ bid
@@ -18,6 +19,11 @@ But that's terrible coding. idk.
 length of listing.bids.all()?
 bids are never used...
 -----
+
 why are there two watchlist objects? and no bids.
 
 
+Why doesn't the css load?
+Increase the margins
+
+Comments, watchlist, close auction, bids.

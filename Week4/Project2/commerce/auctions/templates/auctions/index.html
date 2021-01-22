@@ -3,7 +3,7 @@
 {% block body %}
     <h2>Active Listings</h2>
     
-    <table class="table" style="border-collapse: collapse; border: 1px light gray">
+    <table class="table" style="border: 1px light gray;">
         {% for listing in listings %}    
             <tr>
                 <td style="font-weight: bold;"><a href="{% url 'listings' listing.id %}">{{ listing.title }}</a></td>

@@ -4,13 +4,13 @@
     <h1>Watchlist</h1>    
 
 
-    <table class="table" style="border-collapse: collapse; border: 1px light gray">
+    <table class="table" style="border: 1px light gray;">
         {% for listing in listings %}    
             <tr>
                 <td style="font-weight: bold;"><a href="{% url 'listings' listing.id %}">{{ listing.title }}</a></td>
                 <td> Price: ${{ listing.price }}</td>
                 <td> {{ listing.description }} </td>
-                <td><img class="img-responsive" src="{{ listing.photo }}" alt="{{ listing.title }}" width="400" height="400"></td>
+                <td><img class="img-responsive" src="../{{ listing.photo }}" alt="{{ listing.title }}" width="400" height="400"></td>
             </tr>
         {% empty %}
             <p>No active listings.</p>
