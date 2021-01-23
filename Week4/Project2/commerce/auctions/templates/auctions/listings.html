@@ -2,94 +2,96 @@
 
 {% block body %}
 
-    {% if messages %}
-    <ul class="alert alert-danger" role="alert" style="width: 800px;">
-        {% for message in messages %}
-            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Error: {% endif %}
-                {{ message }}
-        {% endfor %}
-    </ul>
-    {% endif %}
-
-    {% if user == listing.bidder and user != listing.user %}
-        <ul class="alert alert-success" role="alert" style="width: 800 px;">
-            You won this auction!
+    <div style="margin: 20px;">
+        {% if messages %}
+        <ul class="alert alert-danger" role="alert" style="width: 800px;">
+            {% for message in messages %}
+                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Error: {% endif %}
+                    {{ message }}
+            {% endfor %}
         </ul>
-    {% endif %}
+        {% endif %}
 
-    <h2>Listing: {{ listing.title }}</h2>
+        {% if user == listing.bidder and user != listing.user %}
+            <ul class="alert alert-success" role="alert" style="width: 800 px;">
+                You won this auction!
+            </ul>
+        {% endif %}
+
+        <h2>Listing: {{ listing.title }}</h2>
 
 
 
-    <img class="img-responsive" src="../{{ listing.photo }}" alt="{{ listing.title }}" width="300" height="300">
+        <img class="img-responsive" src="../{{ listing.photo }}" alt="{{ listing.title }}" width="300" height="300">
 
-    <p>{{ listing.description }}</p>
-    <br>
-    <h4>${{ listing.price }}</h4>
+        <p>Description: {{ listing.description }}</p>
+        <h4>${{ listing.price }}</h4>
 
-    <p>Category: {{ listing.category.category }}</p>
+        <p>Category: {{ listing.category.category }}</p>
 
-    {% if user == listing.bidder %}
-        <p>x bid(s) so far. Your bid is the current bid. </p>
-    {% endif %}
+        {% if user == listing.bidder %}
+            <p>{{ bids }} bid(s) so far. Your bid is the current bid. </p>
+        {% endif %}
 
-    <div class="form-group">
-        <form action="/listings/{{ listing.id }}" method="post">
-            {% csrf_token %}
-            <input type="text" placeholder="Bid" name="bid" class="form-control"> <br>
-            <input type="submit" value="Place Bid" class="btn btn-primary">
-        </form>        
+        <div class="form-group">
+            <form action="/listings/{{ listing.id }}" method="post">
+                {% csrf_token %}
+                <input type="text" placeholder="Bid" name="bid" class="form-control" style="margin-bottom: 15px;">
+                <input type="submit" value="Place Bid" class="btn btn-primary">
+            </form>        
+        </div>
+
+
+        <p>Comments</p>
+
+        <ul>
+            {% for comment in comments %}
+                <li>{{ comment.comment }}</li>
+            {% empty %}
+                <li>No comments.</li>
+            {% endfor %}       
+            <br>
+
+            <div class="form-group">
+                <form action="/listings/{{ listing.id }}" method="post">
+                    {% csrf_token %}
+                    <input type="text" placeholder="Comment" name="comment" class="form-control" style="margin-bottom: 15px;"> 
+                    <input type="submit" value="Add a comment" class="btn btn-primary">
+                </form>
+            </div>             
+        </ul>
+
+        {% if watchlist %}
+            <p>This item is on your watchlist.</p>
+            <div class="form-group">
+                <form action="/listings/{{ listing.id }}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="Remove" name="watch" class="btn btn-primary">
+                </form>
+            </div>    
+        {% else %}
+            <p> Add to watchlist? </p>
+            <div class="form-group">
+                <form action="/listings/{{ listing.id }}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="Add" name="watch" class="btn btn-primary">
+                </form>
+            </div>    
+        {% endif %}
+
+
+        {% if user == listing.user %}
+            <div class="form-group">
+                <form action="/listings/{{ listing.id }}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="Close Auction" class="btn btn-primary">
+                </form>
+            </div>    
+        {% endif %}
+
+
     </div>
 
-
-    <p>Comments</p>
-
-    <ul>
-        {% for comment in comments %}
-            <li>{{ comment }}</li>
-        {% empty %}
-            <li>No comments.</li>
-        {% endfor %}       
-        <br>
-        <p>Add a comment<p>
-        <div class="form-group">
-            <form action="/listings/{{ listing.id }}" method="post">
-                {% csrf_token %}
-                <input type="text" placeholder="Comment" name="comment" class="form-control"> 
-                <br>
-                <input type="submit" value="OK" class="btn btn-primary">
-            </form>
-        </div>             
-    </ul>
-
-
-    {% if user == listing.user %}
-        <div class="form-group">
-            <form action="/listings/{{ listing.id }}" method="post">
-                {% csrf_token %}
-                <input type="submit" value="Close Auction" class="btn btn-primary">
-            </form>
-        </div>    
-    {% endif %}
-
-
-    {% if watchlist %}
-        <p>This item is on your watchlist.</p>
-        <div class="form-group">
-            <form action="/listings/{{ listing.id }}" method="post">
-                {% csrf_token %}
-                <input type="submit" value="Remove" name="watch" class="btn btn-primary">
-            </form>
-        </div>    
-    {% else %}
-        <p> Add to watchlist? </p>
-        <div class="form-group">
-            <form action="/listings/{{ listing.id }}" method="post">
-                {% csrf_token %}
-                <input type="submit" value="Add" name="watch" class="btn btn-primary">
-            </form>
-        </div>    
-    {% endif %}
 
 
 {% endblock %}

@@ -31,8 +31,7 @@ def listings(request, listing_id):
 
     listing = Listing.objects.get(pk=listing_id)    
     comments = listing.comments.all()
-    # watchlist = User.watchlist.all()
-
+    bids = listing.bids.all().count()
 
     if request.method == "POST":
         if request.user.is_authenticated:
@@ -49,25 +48,21 @@ def listings(request, listing_id):
                 "listing": listing,
                 "comments": comments,
                 "user": user,
-                "watchlist": watchlist
+                "watchlist": watchlist,
+                "bids": bids
             } #how to update context in django without rewriting?
 
             if 'bid' in request.POST:
                 bid = float(format(float(request.POST["bid"]), '.2f'))
                 if bid > listing.price:
-                    # bids = listing.bids.all()
-                    # for b in bids:
-                        # if bid > b:
+                    makebid = Bid.objects.create(listing=listing, bid=bid)
+                    bids = listing.bids.all().count()
                     listing.price = bid
                     listing.bidder = user
                     listing.save()
                     listing = Listing.objects.get(pk=listing_id)
-                    return render(request, "auctions/listings.html", {
-                        "listing": listing,
-                        "comments": comments,
-                        "user": user,
-                        "watchlist": watchlist
-                    })
+                    context.update({"listing": listing, "bids": bids})
+                    return render(request, "auctions/listings.html", context)
 
                 else:
                     messages.error(request, 'Bid must be greater than existing bids.')
@@ -75,15 +70,11 @@ def listings(request, listing_id):
 
             elif 'comment' in request.POST:
                 comment0 = request.POST["comment"]
-                comment = Comment.objects.create(comment=comment0)
+                comment = Comment.objects.create(listing=listing, comment=comment0)
                 comments = listing.comments.all()
 
-                return render(request, "auctions/listings.html", {
-                    "listing": listing,
-                    "comments": comments,
-                    "user": user,
-                    "watchlist": watchlist
-                })
+                context.update({"comments": comments})
+                return render(request, "auctions/listings.html", context)
 
             elif 'watch' in request.POST:
                 watch = request.POST["watch"]
@@ -97,12 +88,8 @@ def listings(request, listing_id):
                     watching.listings.add(listing)
                     watchlist = True
 
-                return render(request, "auctions/listings.html", {
-                    "listing": listing,
-                    "comments": comments,
-                    "user": user,
-                    "watchlist": watchlist
-                })
+                context.update({"watchlist": watchlist})
+                return render(request, "auctions/listings.html", context)
 
             else:
                 return render(request, "auctions/listings.html", context)
@@ -113,7 +100,8 @@ def listings(request, listing_id):
                 "listing": listing,
                 "comments": comments,
                 "user": None,
-                "watchlist": None        
+                "watchlist": None,
+                "bids": bids  
             })
 
     if request.user.is_authenticated:
@@ -125,7 +113,8 @@ def listings(request, listing_id):
             "listing": listing,
             "comments": comments,
             "user": user,
-            "watchlist": watchlist
+            "watchlist": watchlist,
+            "bids": bids
         }
         return render(request, "auctions/listings.html", context)
     else:
@@ -134,7 +123,8 @@ def listings(request, listing_id):
             "listing": listing,
             "comments": comments,
             "user": None,
-            "watchlist": None
+            "watchlist": None,
+            "bids": bids
         }
         return render(request, "auctions/listings.html", context)
 
@@ -185,6 +175,7 @@ def create(request):
             photo = form.cleaned_data["photo"]
             category = form.cleaned_data["category"]
 
+            bid = Bid.objects.create(listing=listing, bid=price)
             categories = Category.objects.all()
             for cate in categories:
                 if category == cate.category:
@@ -194,11 +185,7 @@ def create(request):
             cat = Category.objects.create(category=category) # create new instance of category separate from listing           
             listing = Listing.objects.create(user=user, bidder=user, title=title, description=description, price=price, photo=photo, category=cat)
             
-             # wait but how to define category in the listing object?
-
-
-            # create new instance of category?
-            # cat = Category.objects.create(category=category)
+            
 
             return HttpResponseRedirect(reverse("index"))
         else:

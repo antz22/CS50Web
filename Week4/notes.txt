@@ -8,22 +8,13 @@ Figure out related_name
 
 
 
-close auction
+1) close auction
 
-CSS and HTML...
-
-x bids so far, your bid is the __ bid
-----
-for this, you could have some sort of loop looping through all the bid objects to see how many are associated with that listing?
-But that's terrible coding. idk.
-length of listing.bids.all()?
-bids are never used...
------
-
-why are there two watchlist objects? and no bids.
-
+2) CSS and HTML...
 
 Why doesn't the css load? how to style it not in the html
 Increase the margins
 
-Comments, watchlist, close auction, bids.
+Comments :) , watchlist :) , bids :), CSS and HTML (loading it), close auction
+
+What's the alternative to on delete cascade? doesn't matter. only if the referenced object is deleted
