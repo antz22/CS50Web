@@ -80,7 +80,9 @@
         {% endif %}
 
 
+
         {% if user == listing.user %}
+            <hr>
             <div class="form-group">
                 <form action="/listings/{{ listing.id }}" method="post">
                     {% csrf_token %}

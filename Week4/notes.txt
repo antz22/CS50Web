@@ -9,11 +9,28 @@ Figure out related_name
 
 
 1) close auction
+----
+ohhhh. very simple. delete the listings, but change models.py
+make the listings thing --> on_delete.SET_NULL or something. so you can still access it?hm im not sure. 
+also would have to watch out for other models getting deleted too.
+
+
+----
+
 
 2) CSS and HTML...
 
+-----
+Draw line between watchlist and close auction
+
+**"how to update static css file"
+
 Why doesn't the css load? how to style it not in the html
 Increase the margins
+
+------
+
+
 
 Comments :) , watchlist :) , bids :), CSS and HTML (loading it), close auction
 
