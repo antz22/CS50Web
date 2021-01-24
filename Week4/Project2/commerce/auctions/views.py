@@ -24,6 +24,11 @@ class NewListing(forms.Form):
 
 def index(request):
     return render(request, "auctions/index.html", {
+        "listings": Listing.objects.filter(active=True)
+    })
+
+def all(request):
+    return render(request, "auctions/all.html", {
         "listings": Listing.objects.all()
     })
 
@@ -91,6 +96,12 @@ def listings(request, listing_id):
                 context.update({"watchlist": watchlist})
                 return render(request, "auctions/listings.html", context)
 
+            elif 'close' in request.POST:
+
+                winner = listing.bidder
+                listing.active = False
+                listing.save()
+                return HttpResponseRedirect(reverse('index'))
             else:
                 return render(request, "auctions/listings.html", context)
 
