@@ -36,7 +36,7 @@ def listings(request, listing_id):
 
     listing = Listing.objects.get(pk=listing_id)    
     comments = listing.comments.all()
-    bids = listing.bids.all().count()
+    bids = listing.bids.all().count() - 1
 
     if request.method == "POST":
         if request.user.is_authenticated:
@@ -61,7 +61,7 @@ def listings(request, listing_id):
                 bid = float(format(float(request.POST["bid"]), '.2f'))
                 if bid > listing.price:
                     makebid = Bid.objects.create(listing=listing, bid=bid)
-                    bids = listing.bids.all().count()
+                    bids = listing.bids.all().count() - 1
                     listing.price = bid
                     listing.bidder = user
                     listing.save()
@@ -165,7 +165,7 @@ def categories(request):
 def categoriesv(request, category_id):
     category = Category.objects.get(pk=category_id)
 
-    listings = category.listingsss.all()
+    listings = category.listingsss.filter(active=True)
 
     return render(request, "auctions/categoriesv.html", {
         "category": category,
@@ -186,16 +186,17 @@ def create(request):
             photo = form.cleaned_data["photo"]
             category = form.cleaned_data["category"]
 
-            bid = Bid.objects.create(listing=listing, bid=price)
+            
             categories = Category.objects.all()
             for cate in categories:
                 if category == cate.category:
                     listing = Listing.objects.create(user=user, bidder=user, title=title, description=description, price=price, photo=photo, category=cate)
+                    bid = Bid.objects.create(listing=listing, bid=price)
                     return HttpResponseRedirect(reverse("index"))
            
             cat = Category.objects.create(category=category) # create new instance of category separate from listing           
             listing = Listing.objects.create(user=user, bidder=user, title=title, description=description, price=price, photo=photo, category=cat)
-            
+            bid = Bid.objects.create(listing=listing, bid=price)
             
 
             return HttpResponseRedirect(reverse("index"))
