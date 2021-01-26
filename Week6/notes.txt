@@ -1,0 +1,4 @@
+You can use django to load sections of a webpage by requesting a server but without loading the entire HTML page
+
+scroll.html - can scroll over page of 100 paragraphs
+- if you get to the end, change background color
