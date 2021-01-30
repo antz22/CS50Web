@@ -1,3 +1,21 @@
 textarea {
     min-height: 400px;
 }
+
+.view {
+    height: 40px;
+    width: 80%;
+    text-align: left;
+}
+
+.view.read {
+    background-color: rgb(207, 205, 205);
+}
+
+.view.unread {
+    background-color: white;
+}
+
+.archive {
+    height: 40px;
+}
