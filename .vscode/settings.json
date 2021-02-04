@@ -2,8 +2,11 @@
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
     "python.linting.pylintArgs": [
-        "--load-plugins", 
+       "--load-plugins", 
         "pylint_django",
         "--disable=django-not-configured",
+        "--disable=C0114",
+        "--disable=C0115",
+        "--disable=C0116"
     ]
 }

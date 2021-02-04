@@ -1,0 +1,30 @@
+Testing
+
+How do we know the code we are writing is correct?
+Use library unittest
+Write docstrings for testing!!!
+
+
+
+Continuous Integration and Continuous Delivery
+
+Good code writing practices, especially for big projects
+
+
+
+CI: Anytime someone merges to the main branch, a series of tests is run (automated unit testing) -> fix it before merging
+
+Github Actions - when someone pushes to a repository, make sure it goes through some steps
+- use yaml files to run tests on pushing to a github repository
+
+
+
+
+CD: how it gets deployed. shorter release schedules. incrementally make changes (probably will have less bugs to fix before delivering)
+also advantageous on competitive market, needs to be fast
+
+Use Docker files to run a docker container (more lightweight than virtual machine but still consistent)
+
+
+
+

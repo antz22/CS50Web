@@ -20,6 +20,11 @@ class Flight(models.Model):
     def __str__(self):
         return f"{self.id}: {self.origin} to {self.destination}"
 
+    # addition at Week 7 for testing lecture
+    # make sure this flight is valid by checking these conditions
+    def is_valid_flight(self):
+        return self.origin != self.destination or self.duration >= 0
+
 
 
 # after making edits, use python manage.py makemigrations and then python manage.py migrate
