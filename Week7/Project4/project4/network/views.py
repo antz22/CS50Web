@@ -39,12 +39,25 @@ def posts(request, type):
         posts = Post.objects.filter(
             pass
             # TODO
+            # https://www.quora.com/How-do-I-use-Django-filter-with-multiple-values-on-the-same-query-field
+            # seems to be the problem solved here
         )
 
     # Return emails in reverse chronological order...
     posts = posts.order_by("-datetime").all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
+
+def post(request, post_id):
+
+    post = Post.objects.get(pk=post_id)
+
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        if data.get("likes") is not None:
+            post.likes += 1
+        post.save()
+        return HttpResponse(status=204)
 
 
 @login_required
