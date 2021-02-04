@@ -45,8 +45,9 @@ function compose_email() {
     document.querySelector('#emails-view').style.display = 'block';
     document.querySelector('#compose-view').style.display = 'none';
     document.querySelector('#email-view').style.display = 'none';
-    location.reload();
+
     load_mailbox('sent'); // how to reload this part?
+
     return false;
   }
 
@@ -342,6 +343,8 @@ function load_email(email, type) {
     document.querySelector('#email-view').append(date);
     document.querySelector('#email-view').append(reply);
     document.querySelector('#email-view').append(hr);
+
+    document.querySelector('#email-view').append(body);
 
   }
 
