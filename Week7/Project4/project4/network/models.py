@@ -17,7 +17,7 @@ class Post(models.Model):
             "user": self.user,
             "content": self.content,
             "likes": self.post.likes, # not sure about this one,
-            "datetime": "timestamp": self.datetime.strftime("%b %d %Y, %I:%M %p"),
+            "datetime": self.datetime.strftime("%b %d %Y, %I:%M %p"),
         }
 
 class Profile(models.Model):

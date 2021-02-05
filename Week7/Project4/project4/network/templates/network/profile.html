@@ -1,0 +1,28 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    
+    <h1>{{ profile.username }}</h1>
+
+    <div class="user-info">
+        <b>Followers: {{ followers }}</b>
+        <b>Following: {{ follows }}</b>
+        <form action="/profile/{{ profile.id }}" method="post">
+            {% if followstatus %}
+                <button type="submit" name="unfollow">Unfollow</button>
+            {% else if not followstatus %}
+                <button type="submit" name="follow">Follow</button>
+            {% endif %}
+        </form>
+        
+    </div>
+
+    <div class="posts-view">
+    </div>
+    
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/profile.js' %}"></script>
+{% endblock %}

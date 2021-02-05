@@ -30,6 +30,7 @@ def following(request):
     # hm... maybe you do it all in javascript
 
 
+# API Stuff
 def posts(request, type):
 
     # Filter posts based on type (all, following, etc)
@@ -60,6 +61,15 @@ def post(request, post_id):
         return HttpResponse(status=204)
 
 
+def profiles(request, user_id):
+
+    profile = Post.objects.get(id=user_id)
+    posts = Post.objects.filter(user=profile)
+
+    posts = posts.order_by("-datetime").all()
+    return JsonResponse([post.serialize() for post in posts], safe=False)
+
+
 @login_required
 def newpost(request):
     if request.method == "POST":
@@ -77,11 +87,18 @@ def profile(request, user_id):
     # if someone tried to follow this profile
     if request.method == "POST":
         
-        # the follower
-        user = request.user
-        person = Profile.objects.get(id=user_id)
-        person.followers.add(user)
+        followstatus = request.POST
+        if followstatus["follow"]:
+            user = request.user
+            person = Profile.objects.get(id=user_id)
+            person.followers.add(user)
+            # the follower
 
+        else if followstatus["unfollow"]:
+            user = request.user
+            person = Profile.objects.get(id=user_id)
+            person.followers.remove(user)   
+        
         # what to return? a lot of this is in javascript
     
     # profile of the requested user
@@ -93,11 +110,17 @@ def profile(request, user_id):
     # make sure you get this to be in reverse chronological order, most recent post first
     posts = User.posts.all()    
 
+    if user = request.user in User.followers.all():
+        followstatus = True
+    else:
+        followstatus = False
+
     return render(request, "network/profile.html", {
         "profile": prof,
         "followers": followers,
         "follows": follows,
-        "posts": posts
+        "posts": posts,
+        "followstatus": followstatus
     })
 
 
