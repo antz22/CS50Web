@@ -14,15 +14,16 @@ class Post(models.Model):
 
     def serialize(self):
         return {
-            "user": self.user,
+            "user": self.user.username,
             "content": self.content,
-            "likes": self.post.likes, # not sure about this one,
+            # "likes": Post.objects.get(id=self.id).likes.all().count(), # not sure about this one,
+            # "likes": None,
             "datetime": self.datetime.strftime("%b %d %Y, %I:%M %p"),
         }
 
 class Profile(models.Model):
     person = models.ForeignKey(User, on_delete=models.CASCADE)
-    follows = models.ManyToManyField(User, related_name="followers")
+    follows = models.ManyToManyField(User, related_name="followers", blank=True)
     # a user / follower can have many follows, follow many people
     # -> other way, follows have many followers.
 

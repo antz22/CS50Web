@@ -1,8 +1,13 @@
+import time
 import datetime
-
+import json
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
+from django.core.paginator import Paginator
 from django.db import IntegrityError
+from django.forms.models import model_to_dict
+from django.http import JsonResponse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -31,22 +36,42 @@ def following(request):
 
 
 # API Stuff
-def posts(request, type):
+def posts(request, kind):
+
+    # Get start and end points
+    # start = int(request.GET.get("start") or 0)
+    # end = int(request.GET.get("end") or (start + 9))
+
+    # edits -> delete kind, delete api requests, delete from urls // return JSONReponse
 
     # Filter posts based on type (all, following, etc)
-    if type == "all":
+    if kind == "all":
         posts = Post.objects.all()
-    elif type == "following":
+
+    elif kind == "following":
+        user = request.user
+        person = Profile.object.get(id=user.id)
+        follows = person.follows.all()        
+        # an OR - returns all objects with user that is any one of them in the array of follows
         posts = Post.objects.filter(
-            pass
-            # TODO
-            # https://www.quora.com/How-do-I-use-Django-filter-with-multiple-values-on-the-same-query-field
-            # seems to be the problem solved here
+            user__in=[follows]
         )
+
+    # paginator = Paginator(posts, 10)    
+    # post_number = request.GET.get('page')
+    # post_obj = paginator.get_page(post_number)
+
+    # time.sleep(1)
+
+
+
+
 
     # Return emails in reverse chronological order...
     posts = posts.order_by("-datetime").all()
-    return JsonResponse([post.serialize() for post in posts], safe=False)
+    posts = serializers.serialize('json', posts) # but this is excluding likes! :(
+    return JsonResponse(posts, safe=False)
+    # return render(request, 'index.html', {'post_object': post_obj})
 
 
 def post(request, post_id):
@@ -86,15 +111,14 @@ def profile(request, user_id):
 
     # if someone tried to follow this profile
     if request.method == "POST":
-        
-        followstatus = request.POST
-        if followstatus["follow"]:
+
+        if request.POST["follow"]:
             user = request.user
             person = Profile.objects.get(id=user_id)
             person.followers.add(user)
             # the follower
 
-        else if followstatus["unfollow"]:
+        elif request.POST["unfollow"]:
             user = request.user
             person = Profile.objects.get(id=user_id)
             person.followers.remove(user)   
@@ -110,7 +134,7 @@ def profile(request, user_id):
     # make sure you get this to be in reverse chronological order, most recent post first
     posts = User.posts.all()    
 
-    if user = request.user in User.followers.all():
+    if user == request.user in User.followers.all():
         followstatus = True
     else:
         followstatus = False
@@ -166,6 +190,9 @@ def register(request):
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
+
+            # addition here for profile
+            profile = Profile.objects.create(person=user)
         except IntegrityError:
             return render(request, "network/register.html", {
                 "message": "Username already taken."

@@ -4,9 +4,9 @@ document.querySelector('DOMContentLoaded', function() {
 
 });
 
-function load_page(type) {
+function load_page(kind) {
 
-    if (type === 'all') {
+    if (kind === 'all') {
         fetch('/posts/all')
         .then(response => response.json())
         .then(posts => {
@@ -15,7 +15,7 @@ function load_page(type) {
         })
         .catch(error => console.error(error))
 
-    } else if (type === 'following') {
+    } else if (kind === 'following') {
         fetch('/posts/following')
         .then(response => response.json())
         .then(posts => {
