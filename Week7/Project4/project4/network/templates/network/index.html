@@ -6,6 +6,14 @@
     <h1>All Posts</h1>
 
     <div class="posts-view">
+      <ul>
+        {% for post in posts %}
+
+        <li>user: {{ post.user }}, content: {{ post.content }}, time: {{ post.datetime }}, likes: {{ post.likes }}</li>
+
+        {% endfor %}        
+      </ul>
+
     </div>
     
     <!-- <nav aria-label="posts pagination">

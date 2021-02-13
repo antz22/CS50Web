@@ -16,8 +16,10 @@ from .models import User, Post, Profile, Like
 
 
 def index(request):
-    # posts = Post.objects.all()
-    return render(request, "network/index.html")
+    posts = Post.objects.all()
+    return render(request, "network/index.html", {
+        "posts": posts
+    })
 
 
 @login_required
@@ -109,42 +111,56 @@ def newpost(request):
 
 def profile(request, user_id):
 
+    user = request.user
+
     # if someone tried to follow this profile
     if request.method == "POST":
 
-        if request.POST["follow"]:
-            user = request.user
-            person = Profile.objects.get(id=user_id)
+        if 'follow' in request.POST:
+            person = User.objects.get(id=user_id)
+            user = Profile.objects.get(id=user.id)
             person.followers.add(user)
             # the follower
 
-        elif request.POST["unfollow"]:
-            user = request.user
-            person = Profile.objects.get(id=user_id)
+        elif 'unfollow' in request.POST:
+            person = User.objects.get(id=user_id)
+            user = Profile.objects.get(id=user.id)
             person.followers.remove(user)   
         
         # what to return? a lot of this is in javascript
     
     # profile of the requested user
-    prof = User.objects.get(id=user_id) 
+    prof1 = User.objects.get(id=user_id) 
     # tricky here - followers gets all the followers associated with that user
-    followers = User.followers.all().count()
+    followers = prof1.followers.all().count()
     # follows gets all the reverses of the followers, the ones that the USER followed
-    follows = User.follows.all().count()
+    prof2 = Profile.objects.get(id=user_id)
+    follows = prof2.follows.all().count()
     # make sure you get this to be in reverse chronological order, most recent post first
-    posts = User.posts.all()    
+    posts = prof1.posts.all()    
 
-    if user == request.user in User.followers.all():
-        followstatus = True
+    user_obj = Profile.objects.get(id=user.id)
+
+
+    if user_obj.id != prof1.id:
+        if prof1 in user_obj.follows.all():
+            followstatus = True
+        else:
+            followstatus = False
+        valid = True
     else:
         followstatus = False
+        valid = False
+        
 
     return render(request, "network/profile.html", {
-        "profile": prof,
+        "profile": prof1,
+        "user": user,
         "followers": followers,
         "follows": follows,
         "posts": posts,
-        "followstatus": followstatus
+        "followstatus": followstatus,
+        "valid": valid
     })
 
 
@@ -201,3 +217,9 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+
+# i was too stupid to realize this before, but - all posts and following are probably done without javascript. 
+# need to look into pagination for that
+
+# implement edit post and like and unlike - these should be somewhat similar to mail. learn the javascript.

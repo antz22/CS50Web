@@ -32,4 +32,4 @@ class Profile(models.Model):
 class Like(models.Model):
     like = models.BooleanField()
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="likes")
-    #related name is likes?
+    # make it default = 0?

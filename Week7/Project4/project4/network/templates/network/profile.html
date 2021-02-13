@@ -1,4 +1,6 @@
 {% extends "network/layout.html" %}
+{% load static %}
+
 
 {% block body %}
     
@@ -7,14 +9,21 @@
     <div class="user-info">
         <b>Followers: {{ followers }}</b>
         <b>Following: {{ follows }}</b>
-        <form action="/profile/{{ profile.id }}" method="post">
-            {% if followstatus %}
-                <button type="submit" name="unfollow">Unfollow</button>
-            {% else if not followstatus %}
-                <button type="submit" name="follow">Follow</button>
-            {% endif %}
-        </form>
         
+        {% if valid %}
+            {{ prof1.username }}
+            <form action="/profile/{{ profile.id }}" method="post">
+                {% csrf_token %}
+                {% if followstatus %}
+                    <button type="submit" name="unfollow">Unfollow</button>
+                {% elif not followstatus %}
+                    <button type="submit" name="follow">Follow</button>
+                {% endif %}
+            </form>
+                
+        {% endif %}
+        
+
     </div>
 
     <div class="posts-view">
