@@ -7,7 +7,13 @@ document.querySelector('DOMContentLoaded', function() {
 function load_page(kind) {
 
     if (kind === 'all') {
-        document.getElementById('edit')
+        fetch('/posts/all')
+        .then(response => response.json())
+        .then(posts => {
+            console.log(posts);
+            posts.forEach(load_posts());
+        })
+        .catch(error => console.error(error))
 
     } else if (kind === 'following') {
         fetch('/posts/following')
@@ -18,9 +24,7 @@ function load_page(kind) {
         })
 
     }
-// how to make it so that clicking the button triggers javascript code? 
-// somehow append the button 'edit' to every post in javascript only? but is that the right way to do it?
-// after that, can use .innerHTML with wiki 'edit.html' and fetch calls we've done before
+        
 
 }
 

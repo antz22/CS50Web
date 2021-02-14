@@ -4,42 +4,35 @@
 {% block body %}
     
     <h1>All Posts</h1>
+    
 
     <div class="posts-view">
-      <ul>
-        {% for post in posts %}
+      {% for post in page_obj %}
 
-        <li>user: {{ post.user }}, content: {{ post.content }}, time: {{ post.datetime }}, likes: {{ post.likes }}</li>
+        <hr>
+        {% if post.user == request.user %}
+          <input type="submit" value="Edit" class="btn btn-primary" id="edit">
+        {% endif %}
+        {{ post.user }}<br>
+        {{ post.content }}<br>
+        {{ post.datetime }}<br>
+        {{ post.likes }}
+        <hr>
 
-        {% endfor %}        
-      </ul>
-
+      {% endfor %}        
     </div>
-    
-    <!-- <nav aria-label="posts pagination">
-        <ul class="pagination">
-          <li class="page-item disabled">
-            <span class="page-link">Previous</span>
-          </li>
-          <li class="page-item"><a class="page-link" href="#">1</a></li>
-          <li class="page-item active" aria-current="page">
-            <span class="page-link">
-              2
-              <span class="sr-only">(current)</span>
-            </span>
-          </li>
-          <li class="page-item"><a class="page-link" href="#">3</a></li>
-          <li class="page-item">
-            <a class="page-link" href="#">Next</a>
-          </li>
-        </ul>
-      </nav>
-    
+
     <div class="pagination">
-        <span class="step-links">
+
+      <nav aria-label="Page navigation">
+
+        <ul class="pagination">
+
+          <span class="step-links">
+
             {% if page_obj.has_previous %}
-                <a href="?page=1">&laquo; first</a>
-                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
             {% endif %}
     
             <span class="current">
@@ -47,11 +40,28 @@
             </span>
     
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}">next</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a></li>
             {% endif %}
-        </span>
-    </div> -->
+            
+          </span>          
+
+        </ul>
+
+      </nav>
+
+    </div>
+    
+    <!-- <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+        <li class="page-item"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+      </ul>
+    </nav> -->
+
 
 {% endblock %}
 

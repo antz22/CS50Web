@@ -1,37 +1,43 @@
 document.querySelector('DOMContentLoaded', function() {
 
-    load_page('all');
+    const profile = "{{ profile }}";
+    // let followstatus = "{{ followstatus }}";
+
+
+    load_profile();
 
 });
 
-function load_page(kind) {
+function load_profile() {
 
-    if (kind === 'all') {
-        document.getElementById('edit')
 
-    } else if (kind === 'following') {
-        fetch('/posts/following')
-        .then(response => response.json())
-        .then(posts => {
-            console.log(posts);
-            posts.forEach(load_posts());
-        })
-
-    }
-// how to make it so that clicking the button triggers javascript code? 
-// somehow append the button 'edit' to every post in javascript only? but is that the right way to do it?
-// after that, can use .innerHTML with wiki 'edit.html' and fetch calls we've done before
-
+    fetch(`/profile/${profile.id}`)
+    .then(response => response.json())
+    .then(posts => {
+        console.log(posts);
+        posts.forEach(load_profposts());
+    })
+    .catch(error => console.error(error))
+        
 }
 
 
-function load_posts(post) {
+function load_profposts(post) {
+
+    // if (followstatus === true) {
+    //     const unfollow = document.createElement('h6');
+    //     unfollow.innerHTML = `<b> Unfollow </b>`;        
+    //     unfollow.id = 'unfollow';
+    // } else if (followstatus === false) {
+    //     const follow = document.createElement('h6');
+    //     follow.innerHTML = `<b> Follow </b>`;              
+    //     follow.id = 'follow';
+    // }
+
 
     document.querySelector('posts-view').innerHTML = '';
     const post = document.createElement('div');
     post.className = "view-post";
-    const user = document.createElement('h6');
-    user.innerHTML = `<b> <a href='/profile/{% post.user.id %}/'> ${post.user} </a> </b>`;
     const content = document.createElement('p');
     content.innerHTML = `${post.content}`;
     const timestamp = document.createElement('p');
@@ -40,6 +46,7 @@ function load_posts(post) {
     likes.innerHTML = `${post.likes}`;
     likes.id = 'likes';
     let liked = false;
+
     document.addEventListener('click', function(event) {
         const element = event.target;
         if (element.id === 'likes' && liked === false) {
@@ -59,17 +66,12 @@ function load_posts(post) {
                 })
             })
             liked = false;            
-        }
+        } 
     })
 
-    post.append(user, content, timestamp, likes)
+
+    post.append(content, timestamp, likes)
     document.querySelector('#posts-view').append(post)
 
 
 }
-
-
-
-
-// figure out self.serialize and sending api stuff
-// pagination

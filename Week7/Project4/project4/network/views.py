@@ -17,8 +17,14 @@ from .models import User, Post, Profile, Like
 
 def index(request):
     posts = Post.objects.all()
+    paginator = Paginator(posts, 10)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, "network/index.html", {
-        "posts": posts
+        "posts": posts,
+        "page_obj": page_obj
     })
 
 
@@ -26,11 +32,24 @@ def index(request):
 def following(request):
 
     user = request.user
-    person = Profile.objects.get(person=user)
-    follows = person.follows.all()
+    person = Profile.objects.get(id=user.id)
+    # follows = person.follows.all()
+    followss = person.follows.all().values_list('id', flat=True).order_by('id')
+    follows = list(followss)
+    # an OR - returns all objects with user that is any one of them in the array of follows
+    posts = Post.objects.filter(
+        user__in=follows
+    )
 
+    paginator = Paginator(posts, 10)
 
-    return render(request, "network/following.html")
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "network/following.html", {
+        "posts": posts,
+        "page_obj": page_obj
+    })
 
     # posts = Post.objects.filter()
     # how do you filter this? some sort of list of objects, some for loop to collect all of it?
@@ -52,30 +71,29 @@ def posts(request, kind):
 
     elif kind == "following":
         user = request.user
-        person = Profile.object.get(id=user.id)
-        follows = person.follows.all()        
+        person = Profile.objects.get(id=user.id)
+        follows = person.follows.all()
+        # follows = person.follows.values_list('id', flat=True).order_by('id')
+
         # an OR - returns all objects with user that is any one of them in the array of follows
         posts = Post.objects.filter(
             user__in=[follows]
         )
 
-    # paginator = Paginator(posts, 10)    
+    # paginator = Paginator(posts, 10)
     # post_number = request.GET.get('page')
     # post_obj = paginator.get_page(post_number)
 
     # time.sleep(1)
 
-
-
-
-
     # Return emails in reverse chronological order...
     posts = posts.order_by("-datetime").all()
-    posts = serializers.serialize('json', posts) # but this is excluding likes! :(
+    posts = serializers.serialize(
+        'json', posts)  # but this is excluding likes! :(
     return JsonResponse(posts, safe=False)
     # return render(request, 'index.html', {'post_object': post_obj})
 
-
+# API Stuff
 def post(request, post_id):
 
     post = Post.objects.get(pk=post_id)
@@ -87,7 +105,7 @@ def post(request, post_id):
         post.save()
         return HttpResponse(status=204)
 
-
+# API stuff
 def profiles(request, user_id):
 
     profile = Post.objects.get(id=user_id)
@@ -105,7 +123,7 @@ def newpost(request):
         d = datetime.datetime.now()
         Post.objects.create(user=user, content=content, datetime=d)
         return HttpResponseRedirect(reverse("index"))
-    
+
     return render(request, "network/newpost.html")
 
 
@@ -125,22 +143,21 @@ def profile(request, user_id):
         elif 'unfollow' in request.POST:
             person = User.objects.get(id=user_id)
             user = Profile.objects.get(id=user.id)
-            person.followers.remove(user)   
-        
+            person.followers.remove(user)
+
         # what to return? a lot of this is in javascript
-    
+
     # profile of the requested user
-    prof1 = User.objects.get(id=user_id) 
+    prof1 = User.objects.get(id=user_id)
     # tricky here - followers gets all the followers associated with that user
     followers = prof1.followers.all().count()
     # follows gets all the reverses of the followers, the ones that the USER followed
     prof2 = Profile.objects.get(id=user_id)
     follows = prof2.follows.all().count()
     # make sure you get this to be in reverse chronological order, most recent post first
-    posts = prof1.posts.all()    
+    posts = prof1.posts.all()
 
     user_obj = Profile.objects.get(id=user.id)
-
 
     if user_obj.id != prof1.id:
         if prof1 in user_obj.follows.all():
@@ -151,7 +168,6 @@ def profile(request, user_id):
     else:
         followstatus = False
         valid = False
-        
 
     return render(request, "network/profile.html", {
         "profile": prof1,
@@ -219,7 +235,8 @@ def register(request):
         return render(request, "network/register.html")
 
 
-# i was too stupid to realize this before, but - all posts and following are probably done without javascript. 
+# i was too stupid to realize this before, but - all posts and following are probably done without javascript.
 # need to look into pagination for that
 
 # implement edit post and like and unlike - these should be somewhat similar to mail. learn the javascript.
+
