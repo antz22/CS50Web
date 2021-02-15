@@ -1,23 +1,42 @@
-document.querySelector('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-    load_page('all');
+    document.getElementByClassName("posts-view").addEventListener('click', function(event) {
+        const element = event.target;
+        if (element.classList.containts("edit")) {
+            // problem here -- would probably just return the first one
+            const parent = element.parentNode;
+            const content = parentNode.querySelector('#content').value;
+            // document.querySelector(`#${element.className}`).innerHTML = '';
+            content.innerHTML = `<textarea>${content}</textarea>`;
+            const submit = document.createElement('button');
+            submit.id = 'submit-edit';
+            submit.innerHTML = `Save`;
+            document.addEventListener('click', function(e) {
+                const el = e.target;
+                if (el.id === 'submit-edit') {
+                    const newContent = content.value;
+                    fetch(`/posts/${post.id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            content: newContent
+                        })
+                    })
+                }
+            });
+
+            parentNode.append(submit);
+
+            
+        }
+    })
+    // var x = document.getElementsByClassName("example");
+
 
 });
 
 function load_page(kind) {
 
-    if (kind === 'all') {
-        document.getElementById('edit')
-
-    } else if (kind === 'following') {
-        fetch('/posts/following')
-        .then(response => response.json())
-        .then(posts => {
-            console.log(posts);
-            posts.forEach(load_posts());
-        })
-
-    }
+    
 // how to make it so that clicking the button triggers javascript code? 
 // somehow append the button 'edit' to every post in javascript only? but is that the right way to do it?
 // after that, can use .innerHTML with wiki 'edit.html' and fetch calls we've done before

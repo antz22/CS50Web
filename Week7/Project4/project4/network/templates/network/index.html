@@ -9,15 +9,19 @@
     <div class="posts-view">
       {% for post in page_obj %}
 
-        <hr>
-        {% if post.user == request.user %}
-          <input type="submit" value="Edit" class="btn btn-primary" id="edit">
-        {% endif %}
-        {{ post.user }}<br>
-        {{ post.content }}<br>
-        {{ post.datetime }}<br>
-        {{ post.likes }}
-        <hr>
+        <div class="post">
+
+          <hr>
+          <p><b>{{ post.user }}</b></p>
+          {% if post.user == request.user %}
+            <input type="submit" value="Edit" class="btn btn-primary edit"><br>
+          {% endif %}          
+          <p id="content">{{ post.content }}</p>
+          {{ post.datetime }}<br>
+          {{ post.likes.count }} likes<br>
+          <hr>
+
+        </div>
 
       {% endfor %}        
     </div>
@@ -51,20 +55,10 @@
       </nav>
 
     </div>
-    
-    <!-- <nav aria-label="Page navigation example">
-      <ul class="pagination">
-        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#">Next</a></li>
-      </ul>
-    </nav> -->
 
 
 {% endblock %}
 
 {% block script %}
-    <script src="{% static 'network/posts.js' %}"></script>
+  <script src="{% static 'network/posts.js' %}"></script>
 {% endblock %}
