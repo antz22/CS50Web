@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const element = event.target;
         if (element.classList.containts("edit")) {
             // problem here -- would probably just return the first one
+            console.log('Hi!');
             const parent = element.parentNode;
             const content = parentNode.querySelector('#content').value;
             // document.querySelector(`#${element.className}`).innerHTML = '';

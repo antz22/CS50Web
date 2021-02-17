@@ -14,7 +14,7 @@
           <hr>
           <p><b>{{ post.user }}</b></p>
           {% if post.user == request.user %}
-            <input type="submit" value="Edit" class="btn btn-primary edit"><br>
+            <button type="button" class="btn btn-link edit">Edit</button><br>
           {% endif %}          
           <p id="content">{{ post.content }}</p>
           {{ post.datetime }}<br>

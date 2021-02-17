@@ -94,6 +94,8 @@ def posts(request, kind):
     # return render(request, 'index.html', {'post_object': post_obj})
 
 # API Stuff
+
+
 def post(request, post_id):
 
     post = Post.objects.get(pk=post_id)
@@ -106,6 +108,8 @@ def post(request, post_id):
         return HttpResponse(status=204)
 
 # API stuff
+
+
 def profiles(request, user_id):
 
     profile = Post.objects.get(id=user_id)
@@ -239,4 +243,3 @@ def register(request):
 # need to look into pagination for that
 
 # implement edit post and like and unlike - these should be somewhat similar to mail. learn the javascript.
-
