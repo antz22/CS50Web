@@ -28,3 +28,5 @@ Use Docker files to run a docker container (more lightweight than virtual machin
 
 
 
+OMGGGGGGG
+just make sure you have {% block script %} {% endblock %} in layout.html. :(
