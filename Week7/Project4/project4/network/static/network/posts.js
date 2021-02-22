@@ -1,97 +1,112 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    document.getElementsByClassName("#posts-view").addEventListener('click', function(event) {
-        // problem here
+    document.querySelector('#posts-view').addEventListener('click', function(event) {
         const element = event.target;
+        const parent = event.target.parentNode;
         console.log(element);
-        if (element.classList.containts("edit")) {
-            // problem here -- would probably just return the first one
-            console.log('Hi!');
-            const parent = element.parentNode;
-            const content = parentNode.querySelector('#content').value;
-            // document.querySelector(`#${element.className}`).innerHTML = '';
-            content.innerHTML = `<textarea>${content}</textarea>`;
+        if (element.classList.contains("edit")) {
+            const content = element.nextElementSibling;
+            const contText = document.createElement('textarea');
+            contText.value = content.innerHTML;
+            contText.classList.add('form-control');
+            content.innerHTML = '';
+            content.appendChild(contText);
             const submit = document.createElement('button');
             submit.id = 'submit-edit';
+            submit.classList.add('btn');
+            submit.classList.add('btn-primary');
             submit.innerHTML = `Save`;
             document.addEventListener('click', function(e) {
                 const el = e.target;
+
+                const postId = parent.id;
+
                 if (el.id === 'submit-edit') {
-                    const newContent = content.value;
-                    fetch(`/posts/${post.id}`, {
+                    const newContent = contText.value;
+                    fetch(`/posts/${postId}`, {
                         method: 'PUT',
                         body: JSON.stringify({
                             content: newContent
-                        })
+                        }),
+                        credentials: 'same-origin',
+                        headers: {
+                            "X-CSRFToken": getCookie("csrftoken")
+                        }
                     })
+                    submit.remove();
+                    content.innerHTML = `${newContent}`;
                 }
             });
 
-            parentNode.append(submit);
-
+            parent.append(content);
+            parent.append(submit);
+ 
             
+        } else if (element.classList.contains("like")) {
+            document.addEventListener('click', function(e) {
+                const el = e.target;
+                const postId = parent.id;
+                const likes = element.previousElementSibling;
+                const likesVal = parseInt(likes.innerHTML, 10);
+
+                console.log(likes);
+                console.log(el);
+                console.log(likesVal);
+
+                if (el.classList.contains("unlike")) {
+                    fetch(`/posts/${postId}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            likes: likesVal-1
+                        }),
+                        credentials: 'same-origin',
+                        headers: {
+                            "X-CSRFToken": getCookie("csrftoken")
+                        }
+                    })
+                    likes.innerHTML = `${likesVal-1}`;    
+                    console.log(likes);
+                    console.log(likesVal);
+                    location.reload();
+                } else {
+                    fetch(`/posts/${postId}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            likes: likesVal+1
+                        }),
+                        credentials: 'same-origin',
+                        headers: {
+                            "X-CSRFToken": getCookie("csrftoken")
+                        }
+                    })
+                    console.log(likes);
+                    console.log(likesVal);
+                    likes.innerHTML = `${likesVal+1}`;       
+                    location.reload();                
+                }
+                
+            });
+
         }
     })
-    // var x = document.getElementsByClassName("example");
+
 
 
 });
 
-function load_page(kind) {
-
-    
-// how to make it so that clicking the button triggers javascript code? 
-// somehow append the button 'edit' to every post in javascript only? but is that the right way to do it?
-// after that, can use .innerHTML with wiki 'edit.html' and fetch calls we've done before
-
+function getCookie(c_name) {
+    var c_value = " " + document.cookie;
+    var c_start = c_value.indexOf(" " + c_name + "=");
+    if (c_start == -1) {
+        c_value = null;
+    }
+    else {
+        c_start = c_value.indexOf("=", c_start) + 1;
+        var c_end = c_value.indexOf(";", c_start);
+        if (c_end == -1) {
+            c_end = c_value.length;
+        }
+        c_value = unescape(c_value.substring(c_start,c_end));
+    }
+    return c_value;
 }
-
-
-// function load_posts(post) {
-
-//     document.querySelector('posts-view').innerHTML = '';
-//     const post = document.createElement('div');
-//     post.className = "view-post";
-//     const user = document.createElement('h6');
-//     user.innerHTML = `<b> <a href='/profile/{% post.user.id %}/'> ${post.user} </a> </b>`;
-//     const content = document.createElement('p');
-//     content.innerHTML = `${post.content}`;
-//     const timestamp = document.createElement('p');
-//     timestamp.innerHTML = `${post.datetime}`;
-//     const likes = document.createElement('p');
-//     likes.innerHTML = `${post.likes}`;
-//     likes.id = 'likes';
-//     let liked = false;
-//     document.addEventListener('click', function(event) {
-//         const element = event.target;
-//         if (element.id === 'likes' && liked === false) {
-//             fetch(`/posts/${post.id}`, {
-//                 method: 'PUT',
-//                 body: JSON.stringify({
-//                     likes: (likes+1)
-//                 })
-//             })
-//             liked = true;
-//             // location.reload()?
-//         } else if (element.id === 'likes' && liked === true) {
-//             fetch(`/posts/${post.id}`, {
-//                 method: 'PUT',
-//                 body: JSON.stringify({
-//                     likes: (likes-1)
-//                 })
-//             })
-//             liked = false;            
-//         }
-//     })
-
-//     post.append(user, content, timestamp, likes)
-//     document.querySelector('#posts-view').append(post)
-
-
-// }
-
-
-
-
-// figure out self.serialize and sending api stuff
-// pagination

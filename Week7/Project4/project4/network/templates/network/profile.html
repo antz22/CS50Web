@@ -7,17 +7,16 @@
     <h1>{{ profile.username }}</h1>
 
     <div class="user-info">
-        <b>Followers: {{ followers }}</b>
-        <b>Following: {{ follows }}</b>
+        <p><b>{{ followers }} followers |  {{ follows }} following</b></p>
         
         {% if valid %}
             {{ prof1.username }}
             <form action="/profile/{{ profile.id }}" method="post">
                 {% csrf_token %}
                 {% if followstatus %}
-                    <button type="submit" name="unfollow">Unfollow</button>
+                    <button type="submit" name="unfollow" class="btn btn-primary">Unfollow</button>
                 {% elif not followstatus %}
-                    <button type="submit" name="follow">Follow</button>
+                    <button type="submit" name="follow" class="btn btn-primary">Follow</button>
                 {% endif %}
             </form>
                 
@@ -26,8 +25,31 @@
 
     </div>
 
-    <div class="posts-view">
-    </div>
+    <div class="posts-view" id="posts-view">
+        {% for post in posts %}
+  
+          <div class="post" id="{{ post.id }}">
+  
+            <span class="date">{{ post.datetime }}<br></span>
+            <span>{{ post.likes.count }}</span>
+            {% if user.is_authenticated %}
+              {% if post in likes.posts.all %}
+                <a href="#" class="like unlike" id="like{{ post.id }}">Unlike</a><br>
+              {% else %}
+                <a href="#" class="like" id="like {{ post.id }}">Like</a><br>
+              {% endif %}
+            {% endif %}  
+            {% if post.user == request.user %}
+              <a href="#" class="edit">Edit</a>
+            {% endif %}          
+            <p class="content">{{ post.content }}</p>
+  
+  
+          </div>
+          <br>
+  
+        {% endfor %}        
+      </div>
     
 
 {% endblock %}

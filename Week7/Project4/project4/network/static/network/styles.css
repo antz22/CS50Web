@@ -1,5 +1,21 @@
 .posts-view {
     margin: 20px;
+    padding: 10px;
+}
+
+.posts-view div {
+    border-style: solid;
+    border-width: 1.5px;
+    border-color: lightgray;
+    padding: 20px;
+}
+
+.posts-view span.date {
+    color: gray;
+}
+
+.user-info {
+    margin: 20px;
 }
 
 h1 {

@@ -4,54 +4,68 @@
 {% block body %}
     
     <h1>Following</h1>
+    
 
-
-    <div class="posts-view">
+    <div class="posts-view" id="posts-view">
       {% for post in page_obj %}
 
-        <hr>
-        {{ post.user }}<br>
-        {{ post.content }}<br>
-        {{ post.datetime }}<br>
-        {{ post.likes.count }}
-        <hr>
+        <div class="post" id="{{ post.id }}">
+
+          <p><b>{{ post.user }}</b></p>
+          <span class="date">{{ post.datetime }}<br></span>
+          <span>{{ post.likes.count }}</span>
+          {% if user.is_authenticated %}
+            {% if post in likes.posts.all %}
+              <a href="#" class="like unlike" id="like{{ post.id }}">Unlike</a><br>
+            {% else %}
+              <a href="#" class="like" id="like {{ post.id }}">Like</a><br>
+            {% endif %}
+          {% endif %}  
+          {% if post.user == request.user %}
+            <a href="#" class="edit">Edit</a>
+          {% endif %}          
+          <p class="content">{{ post.content }}</p>
+
+
+        </div>
+        <br>
 
       {% endfor %}        
-  </div>
-  
-  <div class="pagination">
+    </div>
 
-    <nav aria-label="Page navigation">
+    <div class="pagination">
 
-      <ul class="pagination">
+      <nav aria-label="Page navigation">
 
-        <span class="step-links">
+        <ul class="pagination">
 
-          {% if page_obj.has_previous %}
-              <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
-              <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
-          {% endif %}
-  
-          <span class="current">
-              Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-          </span>
-  
-          {% if page_obj.has_next %}
-              <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
-              <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a></li>
-          {% endif %}
-          
-        </span>          
+          <span class="step-links">
 
-      </ul>
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% endif %}
+    
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+    
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a></li>
+            {% endif %}
+            
+          </span>          
 
-    </nav>
+        </ul>
 
-  </div>
+      </nav>
+
+    </div>
 
 
 {% endblock %}
 
 {% block script %}
-    <script src="{% static 'network/posts.js' %}"></script>
+  <script src="{% static 'network/posts.js' %}"></script>
 {% endblock %}

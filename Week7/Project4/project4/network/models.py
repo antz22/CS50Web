@@ -10,16 +10,7 @@ class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
     content = models.TextField()
     datetime = models.DateTimeField()
-    # likes = models.ForeignKey(Like, on_delete=models.CASCADE, related_name="likes")
-
-    def serialize(self):
-        return {
-            "user": self.user.username,
-            "content": self.content,
-            # "likes": Post.objects.get(id=self.id).likes.all().count(), # not sure about this one,
-            # "likes": None,
-            "datetime": self.datetime.strftime("%b %d %Y, %I:%M %p"),
-        }
+    
 
 class Profile(models.Model):
     person = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -28,8 +19,9 @@ class Profile(models.Model):
     # -> other way, follows have many followers.
 
 
-
 class Like(models.Model):
-    like = models.BooleanField()
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="likes")
+    # defined for each user, will have many posts in their "like" object
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_likes")
+    # post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="likes")
+    posts = models.ManyToManyField(Post, related_name="likes", blank=True)
     # make it default = 0?

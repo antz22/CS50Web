@@ -16,16 +16,30 @@ from .models import User, Post, Profile, Like
 
 
 def index(request):
-    posts = Post.objects.all()
+    posts = Post.objects.all().order_by('-datetime')
     paginator = Paginator(posts, 10)
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, "network/index.html", {
-        "posts": posts,
-        "page_obj": page_obj
-    })
+    user = request.user
+
+    if request.user.is_authenticated:
+        likes = Like.objects.get(user=user)
+
+        return render(request, "network/index.html", {
+            "posts": posts,
+            "page_obj": page_obj,
+            "user": user,
+            "likes": likes
+        })
+
+    else:
+        return render(request, "network/index.html", {
+            "posts": posts,
+            "page_obj": page_obj,
+            "user": user
+        })        
 
 
 @login_required
@@ -39,84 +53,68 @@ def following(request):
     # an OR - returns all objects with user that is any one of them in the array of follows
     posts = Post.objects.filter(
         user__in=follows
-    )
+    ).order_by('-datetime')
 
     paginator = Paginator(posts, 10)
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, "network/following.html", {
-        "posts": posts,
-        "page_obj": page_obj
-    })
+    user = request.user
 
-    # posts = Post.objects.filter()
-    # how do you filter this? some sort of list of objects, some for loop to collect all of it?
-    # hm... maybe you do it all in javascript
+    if request.user.is_authenticated:
+        likes = Like.objects.get(user=user)
+
+        return render(request, "network/following.html", {
+            "posts": posts,
+            "page_obj": page_obj,
+            "user": user,
+            "likes": likes
+        })
+
+    else:
+        return render(request, "network/following.html", {
+            "posts": posts,
+            "page_obj": page_obj,
+            "user": user
+        })        
 
 
-# API Stuff
-def posts(request, kind):
-
-    # Get start and end points
-    # start = int(request.GET.get("start") or 0)
-    # end = int(request.GET.get("end") or (start + 9))
-
-    # edits -> delete kind, delete api requests, delete from urls // return JSONReponse
-
-    # Filter posts based on type (all, following, etc)
-    if kind == "all":
-        posts = Post.objects.all()
-
-    elif kind == "following":
-        user = request.user
-        person = Profile.objects.get(id=user.id)
-        follows = person.follows.all()
-        # follows = person.follows.values_list('id', flat=True).order_by('id')
-
-        # an OR - returns all objects with user that is any one of them in the array of follows
-        posts = Post.objects.filter(
-            user__in=[follows]
-        )
-
-    # paginator = Paginator(posts, 10)
-    # post_number = request.GET.get('page')
-    # post_obj = paginator.get_page(post_number)
-
-    # time.sleep(1)
-
-    # Return emails in reverse chronological order...
-    posts = posts.order_by("-datetime").all()
-    posts = serializers.serialize(
-        'json', posts)  # but this is excluding likes! :(
-    return JsonResponse(posts, safe=False)
-    # return render(request, 'index.html', {'post_object': post_obj})
-
-# API Stuff
 
 
 def post(request, post_id):
 
     post = Post.objects.get(pk=post_id)
 
+    user = request.user
+
     if request.method == "PUT":
         data = json.loads(request.body)
         if data.get("likes") is not None:
-            post.likes += 1
+            
+            like = Like.objects.get(user=user)
+
+            if post in like.posts.all():
+                post.likes.remove(like)
+                like.posts.remove(post)
+            else:
+                post.likes.add(like)
+                like.posts.add(post)
+
+            like.save()
+
+
+        if data.get("content") is not None:
+            post.content = data["content"]    
+
         post.save()
+        
+
         return HttpResponse(status=204)
+    
+    else:
+        return HttpResponse(status=400)
 
-# API stuff
-
-
-def profiles(request, user_id):
-
-    profile = Post.objects.get(id=user_id)
-    posts = Post.objects.filter(user=profile)
-
-    posts = posts.order_by("-datetime").all()
-    return JsonResponse([post.serialize() for post in posts], safe=False)
 
 
 @login_required
@@ -159,9 +157,11 @@ def profile(request, user_id):
     prof2 = Profile.objects.get(id=user_id)
     follows = prof2.follows.all().count()
     # make sure you get this to be in reverse chronological order, most recent post first
-    posts = prof1.posts.all()
+    posts = prof1.posts.all().order_by('-datetime')
 
     user_obj = Profile.objects.get(id=user.id)
+
+    posts = Post.objects.filter(user=prof1)
 
     if user_obj.id != prof1.id:
         if prof1 in user_obj.follows.all():
@@ -173,15 +173,31 @@ def profile(request, user_id):
         followstatus = False
         valid = False
 
-    return render(request, "network/profile.html", {
-        "profile": prof1,
-        "user": user,
-        "followers": followers,
-        "follows": follows,
-        "posts": posts,
-        "followstatus": followstatus,
-        "valid": valid
-    })
+    if request.user.is_authenticated:
+        likes = Like.objects.get(user=request.user)
+
+        return render(request, "network/profile.html", {
+            "profile": prof1,
+            "followers": followers,
+            "follows": follows,
+            "posts": posts,
+            "followstatus": followstatus,
+            "valid": valid,
+            "posts": posts,
+            "likes": likes
+        })
+
+    else:
+    
+        return render(request, "network/profile.html", {
+            "profile": prof1,
+            "followers": followers,
+            "follows": follows,
+            "posts": posts,
+            "followstatus": followstatus,
+            "valid": valid,
+            "posts": posts
+        })
 
 
 def login_view(request):
@@ -229,6 +245,8 @@ def register(request):
 
             # addition here for profile
             profile = Profile.objects.create(person=user)
+            # addition here for likes
+            like = Like.objects.create(user=user)
         except IntegrityError:
             return render(request, "network/register.html", {
                 "message": "Username already taken."
@@ -239,7 +257,4 @@ def register(request):
         return render(request, "network/register.html")
 
 
-# i was too stupid to realize this before, but - all posts and following are probably done without javascript.
-# need to look into pagination for that
 
-# implement edit post and like and unlike - these should be somewhat similar to mail. learn the javascript.

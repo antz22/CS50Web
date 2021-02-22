@@ -9,19 +9,27 @@
     <div class="posts-view" id="posts-view">
       {% for post in page_obj %}
 
-        <div class="post">
+        <div class="post" id="{{ post.id }}">
 
-          <hr>
-          <p><b>{{ post.user }}</b></p>
+          <p><b><a href="/profile/{{post.user.id}}" style="color: black;">{{ post.user }}</a></b></p>
+          <span class="date">{{ post.datetime }}<br></span>
+          <span>{{ post.likes.count }}</span>
+          {% if user.is_authenticated %}
+            {% if post in likes.posts.all %}
+              <a href="#" class="like unlike" id="like{{ post.id }}">Unlike</a><br>
+            {% else %}
+              <a href="#" class="like" id="like {{ post.id }}">Like</a><br>
+            {% endif %}
+          {% endif %}  
           {% if post.user == request.user %}
-            <button type="button" class="btn btn-link edit">Edit</button><br>
+            <a href="#" class="edit">Edit</a>
           {% endif %}          
-          <p id="content">{{ post.content }}</p>
-          {{ post.datetime }}<br>
-          {{ post.likes.count }} likes<br>
-          <hr>
+          <p class="content">{{ post.content }}</p>
+
 
         </div>
+        <br>
+
 
       {% endfor %}        
     </div>
