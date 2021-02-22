@@ -51,9 +51,7 @@ def following(request):
     followss = person.follows.all().values_list('id', flat=True).order_by('id')
     follows = list(followss)
     # an OR - returns all objects with user that is any one of them in the array of follows
-    posts = Post.objects.filter(
-        user__in=follows
-    ).order_by('-datetime')
+    posts = Post.objects.filter(user__in=follows).order_by('-datetime')
 
     paginator = Paginator(posts, 10)
 
@@ -161,7 +159,7 @@ def profile(request, user_id):
 
     user_obj = Profile.objects.get(id=user.id)
 
-    posts = Post.objects.filter(user=prof1)
+    posts = Post.objects.filter(user=prof1).order_by('-datetime')
 
     if user_obj.id != prof1.id:
         if prof1 in user_obj.follows.all():
