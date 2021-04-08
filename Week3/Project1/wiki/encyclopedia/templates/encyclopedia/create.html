@@ -1,0 +1,34 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Create Entry
+{% endblock %}
+
+
+{% block body %}
+
+    {% if messages %}
+    <ul class="alert alert-danger" role="alert" style="width: 800px;">
+        {% for message in messages %}
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Error: {% endif %}
+                {{ message }}
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <h1>Create Entry</h1>
+
+    <h4>Title</h4>
+    <form id="create" action="{% url 'create' %}" method="post">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="Title">
+    </form>
+
+    <h4>Content</h4>
+
+    <textarea rows="10" id="create" name="content" placeholder="Content in markdown" form="create" style="height: 60vh;"></textarea>
+
+    <br>
+    <input action="{% url 'create' %}" type="submit" form="create" formaction="{% url 'create' %}">
+
+{% endblock %}

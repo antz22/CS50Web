@@ -1,0 +1,26 @@
+What I learned:
+
+Console.log is your best friend for debugging js. Sadly...
+Internal server errors - usually just look to the terminal for those errors
+Refresh the cache! ctr-shift-r
+
+
+What I need to learn:
+
+learn how to debug web applications!!
+Try writing the web applications in vim
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

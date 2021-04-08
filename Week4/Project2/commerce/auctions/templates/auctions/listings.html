@@ -1,0 +1,104 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <div style="margin: 20px;">
+        {% if messages %}
+        <ul class="alert alert-danger" role="alert" style="width: 800px;">
+            {% for message in messages %}
+                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Error: {% endif %}
+                    {{ message }}
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if user == listing.bidder and listing.active == False %}
+            <ul class="alert alert-success" role="alert" style="width: 800 px;">
+                You won this auction!
+            </ul>
+        {% elif listing.active == False %}
+            <ul class="alert alert-info" role="alert" style="width: 800 px;">
+                This auction is closed.
+            </ul>
+        {% endif %}
+
+        <h2>Listing: {{ listing.title }}</h2>
+
+        {% if watchlist %}
+            <div class="form-group">
+                <form action="/listings/{{ listing.id }}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="Remove from watchlist" name="watch" class="btn btn-primary" style="background-color: rgb(185, 48, 48); ">
+                </form>
+            </div>    
+        {% else %}
+            <div class="form-group">
+                <form action="/listings/{{ listing.id }}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="Add to watchlist" name="watch" class="btn btn-primary">
+                </form>
+            </div>    
+        {% endif %}
+
+        <img class="img-responsive" src="../{{ listing.photo }}" alt="{{ listing.title }}" width="300" height="300">
+
+        <p>Description: {{ listing.description }}</p>
+        <h4>${{ listing.price }}</h4>
+
+        <h6>Category: {{ listing.category.category }}</h6>
+
+        <br>
+
+        <p>{{ bids }} bid(s) so far.</p>
+        {% if user == listing.bidder %}
+            <p>Your bid is the current bid.</p>
+        {% endif %}
+
+        <div class="form-group">
+            <form action="/listings/{{ listing.id }}" method="post">
+                {% csrf_token %}
+                <input type="text" placeholder="Bid" name="bid" class="form-control" style="margin-bottom: 15px;">
+                <input type="submit" value="Place Bid" class="btn btn-primary">
+            </form>        
+        </div>
+
+
+        <p>Comments</p>
+
+        <ul>
+            {% for comment in comments %}
+                <li>{{ comment.comment }}</li>
+            {% empty %}
+                <li>No comments.</li>
+            {% endfor %}       
+            <br>
+
+            <div class="form-group">
+                <form action="/listings/{{ listing.id }}" method="post">
+                    {% csrf_token %}
+                    <input type="text" placeholder="Comment" name="comment" class="form-control" style="margin-bottom: 15px;"> 
+                    <input type="submit" value="Add a comment" class="btn btn-primary">
+                </form>
+            </div>             
+        </ul>
+
+
+
+
+
+        {% if user == listing.user and listing.active == True %}
+            <hr>
+            <div class="form-group">
+                <form action="/listings/{{ listing.id }}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="Close Auction" name="close" class="btn btn-primary">
+                </form>
+            </div>    
+        {% endif %}
+
+
+    </div>
+
+
+
+{% endblock %}
